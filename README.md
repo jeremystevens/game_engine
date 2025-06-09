@@ -64,6 +64,13 @@ This project proves that you can build sophisticated game engines without relyin
 - **Performance Optimized**: Efficient component queries and batch processing
 - **Modular Design**: Easy to extend with custom components and systems
 
+### Hot-Reload System
+- **Live Script Reloading**: Automatically reload Python scripts when they change on disk
+- **Development Workflow**: Instant feedback during development without restarting the game
+- **File Monitoring**: Efficient file system watching using Python's built-in modules
+- **Error Handling**: Graceful error handling when reload fails, with detailed error reporting
+- **Selective Reloading**: Choose which scripts to monitor and reload
+
 ## 🏗️ Project Structure
 
 ```
@@ -72,6 +79,7 @@ engine/
 ├── core/
 │   ├── __init__.py
 │   ├── engine.py           # Main GameEngine class
+│   ├── hot_reload.py       # Live script reloading system
 │   ├── logger.py           # Logging system
 │   └── window.py           # Cross-platform window management
 ├── scene/
@@ -115,13 +123,17 @@ Requirements:
 ## 🎮 Quick Start
 
 ```python
-from engine import GameEngine, GameObject, Vector2, Sprite, SoundGenerator
+from engine import GameEngine, GameObject, Vector2, Sprite, SoundGenerator, HotReloadManager
 
 class MyGame(GameEngine):
     def initialize(self):
         # Initialize sound system
         self.sound_generator = SoundGenerator()
         self.sound_generator.initialize_default_sounds()
+        
+        # Setup hot-reload for development (optional)
+        self.hot_reload = HotReloadManager(self)
+        self.hot_reload.watch_file("game_logic.py")  # Watch specific files
         
         # Create a game object
         player = GameObject("Player")
@@ -135,6 +147,10 @@ class MyGame(GameEngine):
         self.current_scene.add_object(player)
     
     def update(self, delta_time):
+        # Update hot-reload system
+        if hasattr(self, 'hot_reload'):
+            self.hot_reload.update()
+        
         # Game logic here
         if self.input_manager.is_key_pressed('space'):
             self.sound_generator.play_sound("bullet")
@@ -173,6 +189,13 @@ Explore the logging system capabilities:
 
 ```bash
 python example_logging_demo.py
+```
+
+### Hot-Reload Development Demo
+Experience live script reloading during development:
+
+```bash
+python example_hot_reload_demo.py
 ```
 
 ### Asteroids Game (1980s Arcade Classic)
@@ -377,6 +400,28 @@ logger.error("Failed to load asset")
 logger.log_performance_stats(fps, frame_time, object_count)
 ```
 
+### Hot-Reload System
+Live script reloading for rapid development iteration:
+
+```python
+from engine import HotReloadManager
+
+# Setup hot-reload in your game
+hot_reload = HotReloadManager(game_engine)
+
+# Watch specific files
+hot_reload.watch_file("player_controller.py")
+hot_reload.watch_file("enemy_ai.py")
+hot_reload.watch_directory("scripts/")
+
+# In your game loop
+def update(self, delta_time):
+    # Check for file changes and reload
+    self.hot_reload.update()
+    
+    # Your game logic here...
+```
+
 ### Scene Management
 Organize your game into scenes for different states:
 
@@ -425,6 +470,8 @@ By studying this engine, you'll learn:
 - **Logging and debugging systems**
 - **Performance monitoring and optimization**
 - **Data-oriented design patterns**
+- **Hot-reload and live development workflows**
+- **File system monitoring and script reloading**
 - Performance optimization techniques
 
 ## 🤝 Contributing
