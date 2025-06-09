@@ -49,28 +49,6 @@ This project proves that you can build sophisticated game engines without relyin
 - **No External Dependencies**: Audio system built entirely with Python standard library
 - **Real-time Playback**: Thread-based sound playback system
 
-### Logging System
-- **Multi-Level Logging**: Support for DEBUG, INFO, WARNING, and ERROR levels
-- **Console and File Output**: Log to console with optional file logging
-- **Performance Monitoring**: Built-in FPS tracking and engine performance metrics
-- **Color-Coded Output**: Visual distinction between log levels in console
-- **Configurable Verbosity**: Adjustable logging levels for development and production
-
-### ECS (Entity Component System)
-- **Pure ECS Architecture**: Complete Entity Component System implementation
-- **Entity Management**: Lightweight entities as simple ID containers
-- **Component System**: Data-only components for position, velocity, sprites, health, and more
-- **System Processing**: Logic systems that process entities with specific component combinations
-- **Performance Optimized**: Efficient component queries and batch processing
-- **Modular Design**: Easy to extend with custom components and systems
-
-### Hot-Reload System
-- **Live Script Reloading**: Automatically reload Python scripts when they change on disk
-- **Development Workflow**: Instant feedback during development without restarting the game
-- **File Monitoring**: Efficient file system watching using Python's built-in modules
-- **Error Handling**: Graceful error handling when reload fails, with detailed error reporting
-- **Selective Reloading**: Choose which scripts to monitor and reload
-
 ## 🏗️ Project Structure
 
 ```
@@ -79,8 +57,6 @@ engine/
 ├── core/
 │   ├── __init__.py
 │   ├── engine.py           # Main GameEngine class
-│   ├── hot_reload.py       # Live script reloading system
-│   ├── logger.py           # Logging system
 │   └── window.py           # Cross-platform window management
 ├── scene/
 │   ├── __init__.py
@@ -99,17 +75,9 @@ engine/
 ├── input/
 │   ├── __init__.py
 │   └── input_manager.py     # Input handling system
-├── audio/
-│   ├── __init__.py
-│   └── sound_generator.py   # Procedural sound generation
-└── ecs/
+└── audio/
     ├── __init__.py
-    ├── entity.py           # Entity and EntityManager
-    ├── component.py        # Base component class
-    ├── components.py       # Common components (Transform, Velocity, etc.)
-    ├── system.py           # System and SystemManager
-    ├── systems.py          # Common systems (Movement, Render, etc.)
-    └── world.py            # ECS World management
+    └── sound_generator.py   # Procedural sound generation
 ```
 
 ## 🚀 Installation
@@ -123,17 +91,13 @@ Requirements:
 ## 🎮 Quick Start
 
 ```python
-from engine import GameEngine, GameObject, Vector2, Sprite, SoundGenerator, HotReloadManager
+from engine import GameEngine, GameObject, Vector2, Sprite, SoundGenerator
 
 class MyGame(GameEngine):
     def initialize(self):
         # Initialize sound system
         self.sound_generator = SoundGenerator()
         self.sound_generator.initialize_default_sounds()
-        
-        # Setup hot-reload for development (optional)
-        self.hot_reload = HotReloadManager(self)
-        self.hot_reload.watch_file("game_logic.py")  # Watch specific files
         
         # Create a game object
         player = GameObject("Player")
@@ -147,10 +111,6 @@ class MyGame(GameEngine):
         self.current_scene.add_object(player)
     
     def update(self, delta_time):
-        # Update hot-reload system
-        if hasattr(self, 'hot_reload'):
-            self.hot_reload.update()
-        
         # Game logic here
         if self.input_manager.is_key_pressed('space'):
             self.sound_generator.play_sound("bullet")
@@ -168,34 +128,6 @@ Run the included example game to see the engine in action:
 
 ```bash
 python example_game.py
-```
-
-### Complete UI Game
-Experience a full-featured game with multiple scenes, UI elements, and particle effects:
-
-```bash
-python ui_game.py
-```
-
-### ECS Architecture Demo
-See the Entity Component System in action:
-
-```bash
-python example_ecs_demo.py
-```
-
-### Logging System Demo
-Explore the logging system capabilities:
-
-```bash
-python example_logging_demo.py
-```
-
-### Hot-Reload Development Demo
-Experience live script reloading during development:
-
-```bash
-python example_hot_reload_demo.py
 ```
 
 ### Asteroids Game (1980s Arcade Classic)
@@ -350,78 +282,6 @@ sound_gen.initialize_default_sounds()
 sound_gen.play_sound("explosion")
 ```
 
-### ECS (Entity Component System)
-Build games using pure ECS architecture:
-
-```python
-from engine import (
-    World, Entity,
-    TransformComponent, VelocityComponent, SpriteComponent,
-    MovementSystem, RenderSystem
-)
-
-# Create ECS world
-world = World()
-
-# Add systems
-world.add_system(MovementSystem())
-world.add_system(RenderSystem(renderer))
-
-# Create entity with components
-player = world.create_entity("player")
-world.add_component(player, TransformComponent(Vector2(400, 300)))
-world.add_component(player, VelocityComponent(Vector2(100, 0)))
-world.add_component(player, SpriteComponent('#0096FF', Vector2(50, 50)))
-
-# Update world each frame
-world.update(delta_time)
-```
-
-### Logging System
-Built-in logging with multiple levels and performance monitoring:
-
-```python
-from engine import Logger
-
-# Get logger instance
-logger = Logger.get_instance()
-
-# Configure logging
-logger.set_level(Logger.Level.INFO)
-logger.enable_file_logging("game.log")
-
-# Log messages
-logger.debug("Debug information")
-logger.info("Game started")
-logger.warning("Low health warning")
-logger.error("Failed to load asset")
-
-# Performance logging
-logger.log_performance_stats(fps, frame_time, object_count)
-```
-
-### Hot-Reload System
-Live script reloading for rapid development iteration:
-
-```python
-from engine import HotReloadManager
-
-# Setup hot-reload in your game
-hot_reload = HotReloadManager(game_engine)
-
-# Watch specific files
-hot_reload.watch_file("player_controller.py")
-hot_reload.watch_file("enemy_ai.py")
-hot_reload.watch_directory("scripts/")
-
-# In your game loop
-def update(self, delta_time):
-    # Check for file changes and reload
-    self.hot_reload.update()
-    
-    # Your game logic here...
-```
-
 ### Scene Management
 Organize your game into scenes for different states:
 
@@ -460,18 +320,12 @@ By studying this engine, you'll learn:
 - 2D and 3D mathematics and coordinate systems
 - Vector mathematics and quaternion rotations
 - Component-based entity systems
-- **Entity Component System (ECS) architecture**
 - Input handling and event processing
 - 2D graphics rendering techniques
 - Transform hierarchies and world/local space conversions
 - Scene management and state machines
 - **Procedural audio generation and waveform synthesis**
 - **Mathematical sound effect creation**
-- **Logging and debugging systems**
-- **Performance monitoring and optimization**
-- **Data-oriented design patterns**
-- **Hot-reload and live development workflows**
-- **File system monitoring and script reloading**
 - Performance optimization techniques
 
 ## 🤝 Contributing
