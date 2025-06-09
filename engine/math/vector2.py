@@ -146,3 +146,8 @@ class Vector2:
             math.cos(angle) * magnitude,
             math.sin(angle) * magnitude
         )
+    
+    def to_vector3(self, z: float = 0.0) -> 'Vector3':
+        """Convert to Vector3 with optional z component"""
+        from .vector3 import Vector3
+        return Vector3(self.x, self.y, z)

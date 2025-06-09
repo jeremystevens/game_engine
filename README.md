@@ -13,6 +13,7 @@ This project proves that you can build sophisticated game engines without relyin
 - **Cross-Platform**: Uses tkinter for universal compatibility across Windows, macOS, and Linux
 - **Game Engine Architecture**: Professional game engine design patterns and structure
 - **Fixed Timestep Game Loop**: Consistent physics and animation regardless of framerate
+- **2D/3D Hybrid Support**: Optional 3D mathematics with 2D rendering capabilities
 
 ### Scene System
 - **Scene Management**: Organize game objects into scenes with lifecycle management
@@ -22,7 +23,9 @@ This project proves that you can build sophisticated game engines without relyin
 
 ### Mathematics (Built from Scratch)
 - **Vector2**: Comprehensive 2D vector implementation with all standard operations
-- **Transform System**: Position, rotation, and scale with parent-child relationships
+- **Vector3**: Full 3D vector mathematics with cross product, magnitude, and transformations
+- **Transform System**: 2D/3D position, rotation, and scale with parent-child relationships
+- **Quaternion Support**: 3D rotation support with quaternion mathematics (optional 3D mode)
 - **Advanced Math**: Dot product, cross product, interpolation, and coordinate transformations
 - **Collision Detection**: Point-in-shape and basic collision detection
 
@@ -38,6 +41,13 @@ This project proves that you can build sophisticated game engines without relyin
 - **Mouse Input**: Mouse position, button states, and click detection
 - **Input Utilities**: Convenience methods for common input patterns (WASD, arrows)
 - **Event-Driven**: Proper event handling with frame-accurate input detection
+
+### Audio System
+- **Procedural Sound Generation**: Create sound effects using mathematical waveforms
+- **Multiple Wave Types**: Support for sine, square, sawtooth, triangle, and noise waves
+- **Sound Effects**: Built-in generators for bullets, explosions, and engine sounds
+- **No External Dependencies**: Audio system built entirely with Python standard library
+- **Real-time Playback**: Thread-based sound playback system
 
 ## 🏗️ Project Structure
 
@@ -55,14 +65,19 @@ engine/
 ├── math/
 │   ├── __init__.py
 │   ├── vector2.py          # 2D vector mathematics
-│   └── transform.py        # Transform component
+│   ├── vector3.py          # 3D vector mathematics
+│   ├── quaternion.py       # 3D rotation quaternions
+│   └── transform.py        # 2D/3D transform component
 ├── graphics/
 │   ├── __init__.py
 │   ├── renderer.py         # 2D rendering system
 │   └── sprite.py           # Sprite rendering component
-└── input/
+├── input/
+│   ├── __init__.py
+│   └── input_manager.py     # Input handling system
+└── audio/
     ├── __init__.py
-    └── input_manager.py     # Input handling system
+    └── sound_generator.py   # Procedural sound generation
 ```
 
 ## 🚀 Installation
@@ -76,10 +91,14 @@ Requirements:
 ## 🎮 Quick Start
 
 ```python
-from engine import GameEngine, GameObject, Vector2, Sprite
+from engine import GameEngine, GameObject, Vector2, Sprite, SoundGenerator
 
 class MyGame(GameEngine):
     def initialize(self):
+        # Initialize sound system
+        self.sound_generator = SoundGenerator()
+        self.sound_generator.initialize_default_sounds()
+        
         # Create a game object
         player = GameObject("Player")
         player.transform.position = Vector2(400, 300)
@@ -94,6 +113,7 @@ class MyGame(GameEngine):
     def update(self, delta_time):
         # Game logic here
         if self.input_manager.is_key_pressed('space'):
+            self.sound_generator.play_sound("bullet")
             print("Space pressed!")
 
 # Run the game
@@ -101,26 +121,44 @@ game = MyGame("My 2D Game", (800, 600))
 game.run()
 ```
 
-## 🎯 Example Game
+## 🎯 Example Games
 
+### Basic Example Game
 Run the included example game to see the engine in action:
 
 ```bash
 python example_game.py
 ```
 
-### Controls:
-- **Arrow keys or WASD**: Move the blue player character
-- **Q/E**: Rotate player
-- **F11**: Toggle fullscreen
+### Asteroids Game (1980s Arcade Classic)
+Experience a complete retro game implementation:
+
+```bash
+python asteroids_game.py
+```
+
+#### Controls:
+- **Left/Right or A/D**: Rotate ship
+- **Up or W**: Thrust
+- **Space or Ctrl**: Shoot
 - **ESC**: Quit game
 
-The example demonstrates:
+#### Features:
+- Classic triangular ship with realistic physics
+- Asteroids that split when shot
+- Screen wrapping mechanics
+- Wave progression system
+- Procedural sound effects (bullets, explosions, engine thrust)
+- Score and lives system
+
+The examples demonstrate:
 - Player movement with keyboard input
-- Rotating enemies moving in circular patterns
+- Rotating enemies and physics simulation
 - Real-time FPS display
 - Component-based architecture
 - Transform hierarchies
+- **Procedural audio generation**
+- Complete game state management
 
 ## 🔧 Architecture Overview
 
@@ -154,6 +192,10 @@ child.transform.parent = parent.transform
 
 # Child position is relative to parent
 child.transform.position = Vector2(50, 0)  # 50 units to the right of parent
+
+# Optional 3D support
+child.transform.enable_3d()
+child.transform.quaternion_rotation = Quaternion.from_axis_angle(Vector3.up(), math.pi/4)
 ```
 
 ### Pure Python Rendering
@@ -198,18 +240,46 @@ player.transform.translate(movement * speed * delta_time)
 ```
 
 ### Vector Mathematics
-Rich 2D vector system with all standard operations:
+Rich 2D and 3D vector systems with all standard operations:
 
 ```python
-# Vector operations
+# 2D Vector operations
 velocity = Vector2(100, 50)
 acceleration = Vector2(0, -9.8)
 velocity += acceleration * delta_time
+
+# 3D Vector operations
+position_3d = Vector3(10, 20, 30)
+direction_3d = Vector3.forward()
+cross_product = position_3d.cross(direction_3d)
 
 # Advanced operations
 distance = player_pos.distance_to(enemy_pos)
 direction = (target_pos - current_pos).normalize()
 rotated = velocity.rotate(math.pi / 4)
+```
+
+### Procedural Audio System
+Generate sound effects using mathematical waveforms:
+
+```python
+from engine import SoundGenerator
+
+# Initialize sound system
+sound_gen = SoundGenerator()
+
+# Create custom sounds
+bullet_sound = sound_gen.create_bullet_sound()
+explosion_sound = sound_gen.create_explosion_sound()
+engine_sound = sound_gen.create_engine_sound()
+
+# Register and play sounds
+sound_gen.register_sound(bullet_sound)
+sound_gen.play_sound("bullet")
+
+# Or use built-in sounds
+sound_gen.initialize_default_sounds()
+sound_gen.play_sound("explosion")
 ```
 
 ### Scene Management
@@ -247,11 +317,15 @@ While this engine prioritizes education and simplicity over raw performance, it 
 By studying this engine, you'll learn:
 
 - Game engine architecture and design patterns
-- 2D mathematics and coordinate systems
+- 2D and 3D mathematics and coordinate systems
+- Vector mathematics and quaternion rotations
 - Component-based entity systems
 - Input handling and event processing
 - 2D graphics rendering techniques
+- Transform hierarchies and world/local space conversions
 - Scene management and state machines
+- **Procedural audio generation and waveform synthesis**
+- **Mathematical sound effect creation**
 - Performance optimization techniques
 
 ## 🤝 Contributing

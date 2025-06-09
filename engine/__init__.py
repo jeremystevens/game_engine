@@ -1,27 +1,33 @@
 """
-Pure Python 2D Game Engine - Built completely from scratch
-No external dependencies - uses only Python standard library
+Pure Python 2D Game Engine
+A complete 2D game engine built entirely in Python using only standard library
 """
 
 from .core.engine import GameEngine
 from .core.window import Window
-from .scene.game_object import GameObject
 from .scene.scene import Scene
+from .scene.game_object import GameObject
 from .math.vector2 import Vector2
+from .math.vector3 import Vector3
 from .math.transform import Transform
+from .math.quaternion import Quaternion
 from .graphics.renderer import Renderer
 from .graphics.sprite import Sprite
 from .input.input_manager import InputManager
+from .audio.sound_generator import SoundGenerator, Sound
 
-__version__ = "1.0.0"
 __all__ = [
     'GameEngine',
     'Window', 
-    'GameObject',
     'Scene',
+    'GameObject',
     'Vector2',
+    'Vector3',
     'Transform',
+    'Quaternion',
     'Renderer',
     'Sprite',
-    'InputManager'
+    'InputManager',
+    'SoundGenerator',
+    'Sound'
 ]

@@ -14,6 +14,10 @@ class Transform:
         self.scale = scale or Vector2.one()
         self._parent = None
         self._children = []
+        
+        # 3D support (optional)
+        self._quaternion_rotation = None
+        self._use_3d = False
     
     def __str__(self) -> str:
         return f"Transform(pos={self.position}, rot={math.degrees(self.rotation):.1f}°, scale={self.scale})"
@@ -116,3 +120,42 @@ class Transform:
         translated = world_point - world_position
         rotated = translated.rotate(-world_rotation)
         return Vector2(rotated.x / world_scale.x, rotated.y / world_scale.y)
+    
+    # 3D Transform Support
+    def enable_3d(self):
+        """Enable 3D transform capabilities"""
+        self._use_3d = True
+        if self._quaternion_rotation is None:
+            from .quaternion import Quaternion
+            self._quaternion_rotation = Quaternion.identity()
+    
+    def disable_3d(self):
+        """Disable 3D transform capabilities"""
+        self._use_3d = False
+        self._quaternion_rotation = None
+    
+    @property
+    def quaternion_rotation(self):
+        """Get quaternion rotation (3D mode only)"""
+        if not self._use_3d:
+            return None
+        return self._quaternion_rotation
+    
+    @quaternion_rotation.setter
+    def quaternion_rotation(self, quat):
+        """Set quaternion rotation (enables 3D mode)"""
+        if not self._use_3d:
+            self.enable_3d()
+        self._quaternion_rotation = quat
+    
+    def set_rotation_from_quaternion(self, quaternion):
+        """Set 2D rotation from quaternion's Z rotation"""
+        if quaternion:
+            euler = quaternion.to_euler_angles()
+            self.rotation = euler[2]  # Use yaw for 2D rotation
+    
+    def get_quaternion_from_rotation(self):
+        """Get quaternion representation of current 2D rotation"""
+        from .quaternion import Quaternion
+        from .vector3 import Vector3
+        return Quaternion.from_axis_angle(Vector3(0, 0, 1), self.rotation)
