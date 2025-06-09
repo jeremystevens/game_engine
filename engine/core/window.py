@@ -48,6 +48,10 @@ class Window:
         self.frame_count = 0
         self.fps_timer = 0.0
         
+        # VSync settings
+        self.vsync_enabled = True
+        self.frame_skip_threshold = 0.1  # Skip frame if too much time has passed
+        
         # Event callbacks
         self.key_press_callback: Optional[Callable] = None
         self.key_release_callback: Optional[Callable] = None
@@ -126,11 +130,17 @@ class Window:
         except tk.TclError:
             self._should_close = True
         
-        # Frame rate limiting
-        elapsed = time.time() - current_time
-        sleep_time = self.frame_time - elapsed
-        if sleep_time > 0:
-            time.sleep(sleep_time)
+        # Frame rate limiting with vsync control
+        if self.vsync_enabled:
+            elapsed = time.time() - current_time
+            sleep_time = self.frame_time - elapsed
+            
+            # Only sleep if we have time left and it's not too long
+            if sleep_time > 0 and sleep_time < self.frame_skip_threshold:
+                time.sleep(sleep_time)
+        else:
+            # Without vsync, just process as fast as possible
+            pass
     
     def clear(self, color: str = '#141928'):
         """Clear the canvas with specified color"""
@@ -162,6 +172,14 @@ class Window:
     def get_center(self) -> Vector2:
         """Get center point of window"""
         return Vector2(self.size.x / 2, self.size.y / 2)
+    
+    def set_vsync(self, enabled: bool):
+        """Enable or disable vsync"""
+        self.vsync_enabled = enabled
+    
+    def get_vsync(self) -> bool:
+        """Get current vsync state"""
+        return self.vsync_enabled
     
     def quit(self):
         """Cleanup and quit"""

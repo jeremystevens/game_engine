@@ -103,6 +103,7 @@ class ExampleGame(GameEngine):
         print("  Arrow keys or WASD - Move player")
         print("  Q/E - Rotate player")
         print("  F11 - Toggle fullscreen")
+        print("  V - Toggle VSync")
         print("  ESC or close window - Quit")
     
     def update(self, delta_time: float):
@@ -113,7 +114,13 @@ class ExampleGame(GameEngine):
         
         # Check for fullscreen toggle
         if self.input_manager.is_key_just_pressed('f11'):
-            self.window.toggle_fullscreen()
+            self.toggle_fullscreen()
+        
+        # Check for vsync toggle
+        if self.input_manager.is_key_just_pressed('v'):
+            current_vsync = self.window.get_vsync()
+            self.set_vsync(not current_vsync)
+            print(f"VSync {'enabled' if not current_vsync else 'disabled'}")
         
         # Update window title with FPS
         fps = self.get_fps()

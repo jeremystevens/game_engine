@@ -37,6 +37,11 @@ class GameEngine:
         self.delta_time = 0.0
         self.total_time = 0.0
         
+        # Delta time smoothing
+        self.delta_time_samples = []
+        self.max_delta_samples = 10
+        self.smoothed_delta_time = 0.0
+        
     def initialize(self):
         """Override this method to initialize your game"""
         pass
@@ -77,8 +82,17 @@ class GameEngine:
                 self.current_scene.initialize()
                 self.next_scene = None
             
-            # Update delta time
-            self.delta_time = self.window.delta_time
+            # Update delta time with smoothing
+            raw_delta = self.window.delta_time
+            self.delta_time_samples.append(raw_delta)
+            
+            # Keep only the last N samples
+            if len(self.delta_time_samples) > self.max_delta_samples:
+                self.delta_time_samples.pop(0)
+            
+            # Calculate smoothed delta time
+            self.smoothed_delta_time = sum(self.delta_time_samples) / len(self.delta_time_samples)
+            self.delta_time = self.smoothed_delta_time
             self.total_time += self.delta_time
             
             # Update input
@@ -125,3 +139,11 @@ class GameEngine:
     def get_total_time(self) -> float:
         """Get total elapsed time"""
         return self.total_time
+    
+    def toggle_fullscreen(self):
+        """Toggle fullscreen mode"""
+        self.window.toggle_fullscreen()
+    
+    def set_vsync(self, enabled: bool):
+        """Enable or disable vsync"""
+        self.window.set_vsync(enabled)
