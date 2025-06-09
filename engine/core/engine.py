@@ -4,6 +4,7 @@ Main game engine class that orchestrates all systems
 import time
 from typing import Optional
 from .window import Window
+from .logger import get_logger, LogLevel
 from ..scene.scene import Scene
 from ..input.input_manager import InputManager
 from ..graphics.renderer import Renderer
@@ -18,6 +19,9 @@ class GameEngine:
         self.size = size
         self.target_fps = target_fps
         self.is_running = False
+        
+        # Initialize logging
+        self.logger = get_logger("Engine")
         
         # Core systems
         self.window = Window(title, size)
@@ -64,18 +68,25 @@ class GameEngine:
     
     def run(self):
         """Main game loop"""
+        self.logger.info(f"Starting game engine: {self.title} ({self.size[0]}x{self.size[1]}) @ {self.target_fps} FPS")
         self.is_running = True
         
         # Initialize the game
+        self.logger.debug("Initializing game...")
         self.initialize()
         
         # Initialize the current scene
         if self.current_scene:
+            self.logger.debug(f"Initializing scene: {self.current_scene.name}")
             self.current_scene.initialize()
         
         while self.is_running and not self.window.should_close():
             # Handle scene transitions
             if self.next_scene:
+                old_scene_name = self.current_scene.name if self.current_scene else "None"
+                new_scene_name = self.next_scene.name
+                self.logger.info(f"Scene transition: {old_scene_name} -> {new_scene_name}")
+                
                 if self.current_scene:
                     self.current_scene.cleanup()
                 self.current_scene = self.next_scene
@@ -119,10 +130,12 @@ class GameEngine:
             self.window.update()
         
         # Cleanup
+        self.logger.info("Shutting down game engine...")
         self.cleanup()
         if self.current_scene:
             self.current_scene.cleanup()
         self.window.quit()
+        self.logger.debug("Game engine shutdown complete")
     
     def quit(self):
         """Quit the game"""

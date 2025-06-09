@@ -49,6 +49,21 @@ This project proves that you can build sophisticated game engines without relyin
 - **No External Dependencies**: Audio system built entirely with Python standard library
 - **Real-time Playback**: Thread-based sound playback system
 
+### Logging System
+- **Multi-Level Logging**: Support for DEBUG, INFO, WARNING, and ERROR levels
+- **Console and File Output**: Log to console with optional file logging
+- **Performance Monitoring**: Built-in FPS tracking and engine performance metrics
+- **Color-Coded Output**: Visual distinction between log levels in console
+- **Configurable Verbosity**: Adjustable logging levels for development and production
+
+### ECS (Entity Component System)
+- **Pure ECS Architecture**: Complete Entity Component System implementation
+- **Entity Management**: Lightweight entities as simple ID containers
+- **Component System**: Data-only components for position, velocity, sprites, health, and more
+- **System Processing**: Logic systems that process entities with specific component combinations
+- **Performance Optimized**: Efficient component queries and batch processing
+- **Modular Design**: Easy to extend with custom components and systems
+
 ## 🏗️ Project Structure
 
 ```
@@ -57,6 +72,7 @@ engine/
 ├── core/
 │   ├── __init__.py
 │   ├── engine.py           # Main GameEngine class
+│   ├── logger.py           # Logging system
 │   └── window.py           # Cross-platform window management
 ├── scene/
 │   ├── __init__.py
@@ -75,9 +91,17 @@ engine/
 ├── input/
 │   ├── __init__.py
 │   └── input_manager.py     # Input handling system
-└── audio/
+├── audio/
+│   ├── __init__.py
+│   └── sound_generator.py   # Procedural sound generation
+└── ecs/
     ├── __init__.py
-    └── sound_generator.py   # Procedural sound generation
+    ├── entity.py           # Entity and EntityManager
+    ├── component.py        # Base component class
+    ├── components.py       # Common components (Transform, Velocity, etc.)
+    ├── system.py           # System and SystemManager
+    ├── systems.py          # Common systems (Movement, Render, etc.)
+    └── world.py            # ECS World management
 ```
 
 ## 🚀 Installation
@@ -128,6 +152,27 @@ Run the included example game to see the engine in action:
 
 ```bash
 python example_game.py
+```
+
+### Complete UI Game
+Experience a full-featured game with multiple scenes, UI elements, and particle effects:
+
+```bash
+python ui_game.py
+```
+
+### ECS Architecture Demo
+See the Entity Component System in action:
+
+```bash
+python example_ecs_demo.py
+```
+
+### Logging System Demo
+Explore the logging system capabilities:
+
+```bash
+python example_logging_demo.py
 ```
 
 ### Asteroids Game (1980s Arcade Classic)
@@ -282,6 +327,56 @@ sound_gen.initialize_default_sounds()
 sound_gen.play_sound("explosion")
 ```
 
+### ECS (Entity Component System)
+Build games using pure ECS architecture:
+
+```python
+from engine import (
+    World, Entity,
+    TransformComponent, VelocityComponent, SpriteComponent,
+    MovementSystem, RenderSystem
+)
+
+# Create ECS world
+world = World()
+
+# Add systems
+world.add_system(MovementSystem())
+world.add_system(RenderSystem(renderer))
+
+# Create entity with components
+player = world.create_entity("player")
+world.add_component(player, TransformComponent(Vector2(400, 300)))
+world.add_component(player, VelocityComponent(Vector2(100, 0)))
+world.add_component(player, SpriteComponent('#0096FF', Vector2(50, 50)))
+
+# Update world each frame
+world.update(delta_time)
+```
+
+### Logging System
+Built-in logging with multiple levels and performance monitoring:
+
+```python
+from engine import Logger
+
+# Get logger instance
+logger = Logger.get_instance()
+
+# Configure logging
+logger.set_level(Logger.Level.INFO)
+logger.enable_file_logging("game.log")
+
+# Log messages
+logger.debug("Debug information")
+logger.info("Game started")
+logger.warning("Low health warning")
+logger.error("Failed to load asset")
+
+# Performance logging
+logger.log_performance_stats(fps, frame_time, object_count)
+```
+
 ### Scene Management
 Organize your game into scenes for different states:
 
@@ -320,12 +415,16 @@ By studying this engine, you'll learn:
 - 2D and 3D mathematics and coordinate systems
 - Vector mathematics and quaternion rotations
 - Component-based entity systems
+- **Entity Component System (ECS) architecture**
 - Input handling and event processing
 - 2D graphics rendering techniques
 - Transform hierarchies and world/local space conversions
 - Scene management and state machines
 - **Procedural audio generation and waveform synthesis**
 - **Mathematical sound effect creation**
+- **Logging and debugging systems**
+- **Performance monitoring and optimization**
+- **Data-oriented design patterns**
 - Performance optimization techniques
 
 ## 🤝 Contributing
